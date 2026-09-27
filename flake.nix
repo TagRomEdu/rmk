@@ -149,6 +149,8 @@
           pkgs.flip-link
           pkgs.just
           pkgs.probe-rs-tools
+          # bindgen в nrf-mpsl-sys/nrf-sdc-sys: newlib-заголовки + arm-none-eabi-objcopy для .bin
+          pkgs.gcc-arm-embedded
         ];
       in {
         formatter = pkgs.alejandra;
@@ -172,10 +174,15 @@
             CARGO_NET_GIT_FETCH_WITH_CLI = "true";
             RUST_MIN_STACK = "67108864";
             RUST_SRC_PATH = "${stableToolchain}/lib/rustlib/src/rust/library";
+            LIBCLANG_PATH = "${pkgs.llvmPackages.libclang.lib}/lib";
           };
 
           shellHook = ''
             export PATH="${toolchainDispatchers}/bin:$PATH"
+            # То же, что CI задаёт через apt: sysroot и заголовки arm-none-eabi для bindgen
+            arm=${pkgs.gcc-arm-embedded}
+            gcc_inc=$(echo "$arm"/lib/gcc/arm-none-eabi/*/include)
+            export BINDGEN_EXTRA_CLANG_ARGS="--sysroot=$arm/arm-none-eabi --target=arm-none-eabi -I$arm/arm-none-eabi/include -I$gcc_inc"
           '';
         };
       }
