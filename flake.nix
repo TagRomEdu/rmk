@@ -151,6 +151,8 @@
           pkgs.probe-rs-tools
           # bindgen в nrf-mpsl-sys/nrf-sdc-sys: newlib-заголовки + arm-none-eabi-objcopy для .bin
           pkgs.gcc-arm-embedded
+          # scripts/op36_uf2.sh: упаковка .bin в UF2
+          pkgs.perl
         ];
       in {
         formatter = pkgs.alejandra;
