@@ -672,7 +672,7 @@ pub(crate) async fn run_ble_peripheral_manager<
 
 fn active_central_conn_param(profile: SplitLinkProfile) -> RequestedConnParams {
     let interval = match profile {
-        SplitLinkProfile::Keyboard => Duration::from_millis(15),
+        SplitLinkProfile::Keyboard => Duration::from_micros(7_500),
         SplitLinkProfile::Pointing => Duration::from_micros(7_500),
     };
     RequestedConnParams {
@@ -1164,11 +1164,11 @@ mod advertisement_tests {
     }
 
     #[test]
-    fn keyboard_profile_retains_15_ms_cadence() {
+    fn keyboard_profile_uses_7_5_ms_cadence() {
         let params = active_central_conn_param(SplitLinkProfile::Keyboard);
 
-        assert_eq!(params.min_connection_interval, Duration::from_millis(15));
-        assert_eq!(params.max_connection_interval, Duration::from_millis(15));
+        assert_eq!(params.min_connection_interval, Duration::from_micros(7_500));
+        assert_eq!(params.max_connection_interval, Duration::from_micros(7_500));
         assert_eq!(params.max_latency, 0);
     }
 

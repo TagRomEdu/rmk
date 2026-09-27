@@ -100,6 +100,9 @@ split_pairing_timeout_seconds = 30
 ble_reconnect_timeout_seconds = 60
 ble_pairing_timeout_seconds = 60
 split_central_sleep_timeout_seconds = 120
+# Меньше задержка на нажатие (по умолчанию 20) и курсор 125 Гц (по умолчанию 20 мс)
+debounce_time = 5
+mouse_key_interval = 8
 combo_max_num = 32
 combo_max_length = 4
 fork_max_num = 32

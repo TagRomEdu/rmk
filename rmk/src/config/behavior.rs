@@ -252,10 +252,10 @@ impl Default for MouseKeyConfig {
         Self {
             // Optimized values for comfortable and responsive mouse movement
             initial_delay_ms: 100,                          // 100ms initial delay
-            repeat_interval_ms: MOUSE_KEY_INTERVAL,         // 20ms between movements
-            move_delta: 5,                                  // 5 pixels per movement (~250 px/sec)
+            repeat_interval_ms: MOUSE_KEY_INTERVAL,         // 8ms between movements (op36 keyboard.toml)
+            move_delta: 2,                                  // 2 pixels per 8ms movement (~250 px/sec)
             max_speed: 3,                                   // Max speed multiplier (250 -> 750 px/sec)
-            ticks_to_max: 50,                               // 50 ticks to max speed (~1s)
+            ticks_to_max: 125,                              // 125 ticks to max speed (~1s at 8ms)
             wheel_initial_delay_ms: 100,                    // 100ms initial wheel delay
             wheel_repeat_interval_ms: MOUSE_WHEEL_INTERVAL, // 80ms between wheel movements
             wheel_delta: 1,                                 // 1 wheel unit per movement
