@@ -1157,7 +1157,10 @@ async fn set_conn_params<'a, 'b, C: Controller + ControllerCmdSync<LeReadLocalSu
     if let Some(config) = host_power_config {
         let mut last_activity = Instant::now();
         let mut last_vial_activity = last_activity;
-        let mut idle_connection = false;
+        // Linux reuses the last accepted parameters for a bonded reconnect,
+        // i.e. the low-duty ones the link had before sleep. Treat such a link
+        // as idle so the first activity restores active parameters.
+        let mut idle_connection = bootstrap == HostConnParamBootstrap::PreserveNegotiated;
         let mut vial_active = false;
 
         loop {
