@@ -14,8 +14,16 @@ Remotes: `origin` — апстрим `ergohaven/rmk`, `fork` — этот реп
 | Шаг mouse keys | 20 мс (50 Гц) | 8 мс (125 Гц) | `keyboards/op36/keyboard.toml`, `[rmk] mouse_key_interval` |
 | Сдвиг курсора за шаг | 5 px | 2 px | `rmk/src/config/behavior.rs`, `MouseKeyConfig::default` |
 | Шагов до макс. скорости | 50 | 125 | там же, `ticks_to_max` |
+| Макс. множитель скорости курсора | 3 | 4 | там же, `max_speed` |
+| Опрос заряда `08 E8 01` | будит клавиатуру | не считается активностью | `rmk/src/host/via/mod.rs`, `is_battery_halves_query` |
 
-Скорость курсора прежняя: 250 px/с на старте, 750 px/с максимум, разгон ~1 с.
+Курсор: 250 px/с на старте (как в релизе), 1000 px/с максимум (в релизе 750), разгон ~1 с.
+
+Опрос заряда: каждый Vial-пакет по BLE считался активностью — сбрасывал таймеры сна и на 30 с
+выключал peripheral latency связи с ПК. Виджет в баре опрашивает раз в минуту, поэтому
+клавиатура не засыпала, а оба split-линка постоянно работали на 7.5 мс. Теперь команда
+заряда половинок проходит мимо таймеров; остальные Vial-команды (Entropy) будят как раньше.
+
 Цена 7.5 мс на split-линке — правая половинка расходует батарею быстрее.
 
 Инфраструктура сборки (в апстриме её нет):
@@ -69,7 +77,8 @@ git push --force-with-lease fork op36-lowlatency
 - `keyboards/op36/keyboard.toml` — строки `debounce_time` и `mouse_key_interval` на месте;
 - `active_central_conn_param` в `rmk/src/split/ble/central.rs` — `Keyboard` остался 7.5 мс
   (функция может переехать или переименоваться — искать по `SplitLinkProfile::Keyboard`);
-- `MouseKeyConfig::default` — `move_delta: 2`, `ticks_to_max: 125`;
+- `MouseKeyConfig::default` — `move_delta: 2`, `max_speed: 4`, `ticks_to_max: 125`;
+- в `rmk/src/ble/mod.rs` перед `VIAL_BLE_ACTIVITY.signal` осталась проверка `is_battery_halves_query`;
 - тест `keyboard_profile_uses_7_5_ms_cadence` — если апстрим поменял значение, обновить;
 - в CHANGELOG апстрима — не сменилась ли схема хранилища (тогда может понадобиться
   `settings_reset.uf2` и повторный импорт раскладки).

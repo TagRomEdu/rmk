@@ -556,8 +556,10 @@ where
                             if event.handle() == hid_output_host.handle || event.handle() == gatt_output_host.handle {
                                 debug!("Got host packet: {:?}", data);
                                 if data_len == 32 {
-                                    VIAL_BLE_ACTIVITY.signal(());
-                                    report_activity();
+                                    if !crate::host::via::is_battery_halves_query(data) {
+                                        VIAL_BLE_ACTIVITY.signal(());
+                                        report_activity();
+                                    }
                                     let endpoint = if event.handle() == gatt_output_host.handle {
                                         crate::channel::BleHostTransport::VendorGatt
                                     } else {

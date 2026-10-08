@@ -38,6 +38,15 @@ const ERGOHAVEN_CUSTOM_NEXT_NATIVE_DYNAMIC_ACTION: u8 = 0x06;
 const ERGOHAVEN_CUSTOM_COMBO_LAYER: u8 = 0x07;
 const ERGOHAVEN_NATIVE_KEY_ACTION_VERSION: u8 = 0x01;
 const ERGOHAVEN_NATIVE_KEY_ACTION_CAP_GET_SET: u16 = 0x0001;
+
+/// Battery polling (e.g. a status bar widget) is not user activity: it must not
+/// keep the keyboard, its split links and the host link out of low-power mode.
+pub(crate) fn is_battery_halves_query(data: &[u8]) -> bool {
+    data.len() >= 3
+        && data[0] == ViaCommand::CustomGetValue as u8
+        && data[1] == ERGOHAVEN_CUSTOM_NAMESPACE
+        && data[2] == ERGOHAVEN_CUSTOM_BATTERY_HALVES
+}
 const ERGOHAVEN_NATIVE_KEY_ACTION_CAP_UNIVERSAL_SYMBOLS: u16 = 0x0002;
 const ERGOHAVEN_NATIVE_KEY_ACTION_CAP_RUSSIAN_LETTERS: u16 = 0x0004;
 const ERGOHAVEN_NATIVE_KEY_ACTION_CAP_COMBO_OUTPUT: u16 = 0x0008;
@@ -868,6 +877,17 @@ mod tests {
             Action::Modifier(ModifierCombination::LCTRL),
             Default::default(),
         )
+    }
+
+    #[test]
+    fn battery_halves_query_is_not_user_activity() {
+        let mut query = [0u8; 32];
+        query[..3].copy_from_slice(&[0x08, 0xE8, 0x01]);
+        assert!(super::is_battery_halves_query(&query));
+
+        query[2] = 0x07;
+        assert!(!super::is_battery_halves_query(&query));
+        assert!(!super::is_battery_halves_query(&[0x08, 0xE8]));
     }
 
     #[test]
